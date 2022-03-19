@@ -3,6 +3,8 @@
 #define REDLEDPIN 13
 #define YELLOWLEDPIN 17 //correspondant au pin A3 = D17 de l'Arduino Nano 
 
+#include <Keypad.h>
+
 void setup() //exécuter qu'une fois au démarrage 
 {
   delay(1000);
