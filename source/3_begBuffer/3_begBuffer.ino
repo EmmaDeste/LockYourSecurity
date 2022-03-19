@@ -5,6 +5,63 @@
 
 
 
+#include <TimeLib.h>
+
+#define DAYDURATION 86400 //24hrs * 60min * 60s
+#define WEEKDURATION 604800 //7 * 24hrs * 60min * 60s
+#define FIRSTMONDAYSEC 1641081600 // time between 1st January 1970 and Sunday 2nd January 2022, 00:00
+
+time_t lastTime = 0;
+
+// set the clock time during the current day
+void setHM(int hour, int minute)
+{
+  time_t oldNow = now(); //get date and time
+  time_t midnightToday = oldNow-oldNow%DAYDURATION; //00:00 today
+
+  time_t newNow = midnightToday + (time_t)hour*3600 + (time_t)minute*60;
+
+  setTime(newNow);
+}
+
+void setDMY(int day, int month, int year)
+{
+
+  time_t oldNow = now(); //get date and time
+  
+  setTime(0,0,0, day, month, year);
+
+  time_t newNow = now() + oldNow%DAYDURATION; ;
+
+  setTime(newNow);
+  
+}
+
+void printTime(time_t t) 
+{
+  Serial.print(day(t)); 
+  Serial.print("/");
+  Serial.print(month(t)); 
+  Serial.print("/");
+  Serial.print(year(t)); 
+  Serial.print("\t");
+  
+  Serial.print(hour(t)); 
+  Serial.print(":");
+  Serial.print(minute(t)); 
+  Serial.print(":");
+  Serial.print(second(t));
+  Serial.print("\tDay of the week is:");
+  Serial.print(weekday(t)); 
+  Serial.print("\tWeek number is:");
+  //Serial.print(weekNum(t)); //weeks since beginning of 2022
+  Serial.print("\ttime_t:");
+  Serial.print(t); //seconds since 01/01/1970
+  Serial.print("\t"); //seconds since 01/01/1970
+}
+
+
+
 #include <Keypad.h>
 
 //we will a buffer to store keystroke
@@ -42,6 +99,15 @@ void processBuff(void)
   {
     serialShowBuff();
     Serial.println();
+
+    if (nbBuff==6 && tabBuff[0] == '*') //*2134# for 21h34
+    {
+      int h;
+      int m;
+      sscanf(tabBuff, "*%02d%02d#", &h, &m);
+      setHM(h,m);
+    }
+    
     clearBuff();
   }
 }
@@ -77,6 +143,9 @@ void setup() //exécuter qu'une fois au démarrage
 
   clearBuff();
 
+  setTime(12,0,0, 19,3,2022);
+  setHM(21,20);
+
 }
 
 
@@ -96,6 +165,15 @@ void loop() //exécuter en boucle
   if (key != NO_KEY){
     addBuff(key); //ln pour sauter la ligne après chaque caractère
   }
-  processBuff();
   
+
+  time_t t = now();
+  //TODO: deal with  something typed quickly after # (meaning less that 1s being lastTime != t)
+  if (lastTime != t)
+  {
+    printTime(t);
+    processBuff();
+    Serial.println();
+    lastTime = t;
+  }
 }
