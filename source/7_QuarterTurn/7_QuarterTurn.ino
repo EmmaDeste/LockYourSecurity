@@ -63,7 +63,7 @@ void printTime(time_t t)
 //we will a buffer to store keystroke
 #define BUFFKEYSIZE 12 //since we need 10 to up the date
 
-char tabBuff[BUFFKEYSIZE];
+char tabBuff[BUFFKEYSIZE+1];  // +1 to have enough space for the '\0' ending  character
 int nbBuff = 0; //number of characters currently in the buffer, so indicate the position of the next character that will be enter
 
 void clearBuff(void)
@@ -75,8 +75,9 @@ void addBuff(char c)
 {
   if (nbBuff < BUFFKEYSIZE)
   {
-    tabBuff[nbBuff]=c;
+    tabBuff[nbBuff] = c;
     nbBuff++;
+    tabBuff[nbBuff] = '\0';
   }
   //TODO: what to do in else case
 }
@@ -112,6 +113,21 @@ void processBuff(void)
       sscanf(tabBuff, "*%02d%02d%04d#", &d, &m, &y);
       setDMY(d,m,y);
     }
+
+    if (nbBuff==4 && tabBuff[0] == '*') // *06# for 6° and *95# for -5°
+    {
+      int sign;
+      int value;
+      sscanf(tabBuff, "*%01d%01d#", &sign, &value);
+      if (sign == 0)
+      {
+        stepperTurn(value);
+      }
+      if (sign == 9)
+      {
+        stepperTurn(-value);
+      }
+    }
     
     clearBuff();
   }
@@ -144,8 +160,18 @@ Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 // initialize the stepper library on pins 14 through 17: 
 Stepper myStepper(STEPSPERREVOLUTION, 14, 15, 16, 17);
 
+void stepperSetup(void)
+{
+  // set the speed of the motor to 6 RPMs (= 1 rev in 10s)
+  myStepper.setSpeed(6); // at maximum speeed (500sps/s) 1step = 2ms, so 1 revolution = 2048 * 2 ms = 4.096s, so maximum RPMs is 60s/4s = 15RPMs
+  //one full opening of the door is one quarter revolution, so 2.5s (=10s/4)
+}
 
-
+void stepperTurn(int deg)
+{
+  long nbSteps = (deg * (long)STEPSPERREVOLUTION) /360;
+  myStepper.step(nbSteps);
+}
 
 
 
@@ -164,6 +190,7 @@ void setup() //exécuter qu'une fois au démarrage
   setTime(12,0,0, 23,5,2018);
   setHM(21,20);
 
+  stepperSetup();
 }
 
 
@@ -190,17 +217,14 @@ void loop() //exécuter en boucle
 
   digitalWrite(REDLEDPIN, HIGH);
   
-  // set the speed of the motor to 6 RPMs (= 1 rev in 10s)
-  myStepper.setSpeed(6); // at maximum speeed (500sps/s) 1step = 2ms, so 1 revolution = 2048 * 2 ms = 4.096s, so maximum RPMs is 60s/4s = 15RPMs
-  //one full opening of the door is one quarter revolution, so 2.5s (=10s/4)
   
   // we perform a quarter revolution clockwise
-  myStepper.step(STEPSPERREVOLUTION /4); //this line will take 2.5s
-  delay(4000);//maintain the door open for 4s
+  //stepperTurn(90);
+  //delay(4000);//maintain the door open for 4s
 
   // we perform a quarter revolution anticlockwise
-  myStepper.step(-STEPSPERREVOLUTION /4); //this line will take 2.5s
-  delay(8000); //maintain the door closed 8s between two vehicles
+  //stepperTurn(-90);
+  //delay(8000); //maintain the door closed 8s between two vehicles
 
   digitalWrite(REDLEDPIN, HIGH);
   delay(200);
