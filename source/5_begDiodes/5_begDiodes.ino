@@ -2,7 +2,9 @@
 
 #define REDLEDPIN 13
 #define YELLOWLEDPIN 17 //correspondant au pin A3 = D17 de l'Arduino Nano 
-
+#define GREENLEDPIN 16
+#define BLUELEDPIN 15
+#define GRLLEDPIN 14
 
 
 #include <TimeLib.h>
@@ -144,6 +146,9 @@ void setup() //exécuter qu'une fois au démarrage
   //dire que cette PIN est utilisée en sortie 
   pinMode(REDLEDPIN, OUTPUT);
   pinMode(YELLOWLEDPIN, OUTPUT);
+  pinMode(GREENLEDPIN, OUTPUT);
+  pinMode(BLUELEDPIN, OUTPUT);
+  pinMode(GRLLEDPIN, OUTPUT);
 
   //initialiser la liaison série à 9600 bits par seconde
   Serial.begin(9600);
@@ -160,10 +165,24 @@ void loop() //exécuter en boucle
 {
   //alternance d'allumage
   digitalWrite(REDLEDPIN, HIGH);
+  delay(200);
   digitalWrite(YELLOWLEDPIN, LOW);
-  delay(100);
+  delay(200);
+  digitalWrite(GREENLEDPIN, LOW);
+  delay(200);
+  digitalWrite(BLUELEDPIN, LOW);
+  delay(200);
+  digitalWrite(GRLLEDPIN, LOW);
+  delay(4000);
   digitalWrite(REDLEDPIN, LOW);
+  delay(200);
   digitalWrite(YELLOWLEDPIN, HIGH);
+  delay(200);
+  digitalWrite(GREENLEDPIN, HIGH);
+  delay(200);
+  digitalWrite(BLUELEDPIN, HIGH);
+  delay(200);
+  digitalWrite(GRLLEDPIN, HIGH);
   delay(4000);
 
   //déclare une variable qui va récupérer ce que l'on tape sur le clavier
