@@ -1,10 +1,6 @@
 //blink LED using 1MO and 220kO resistances, a transistor
 
 #define REDLEDPIN 13
-#define YELLOWLEDPIN 17 //correspondant au pin A3 = D17 de l'Arduino Nano 
-#define GREENLEDPIN 16
-#define BLUELEDPIN 15
-#define GRLLEDPIN 14
 
 
 #include <TimeLib.h>
@@ -141,15 +137,24 @@ Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
 
 
+#include <Stepper.h>
+
+#define STEPSPERREVOLUTION 2048  // 2048 steps results in 1 revolution
+
+// initialize the stepper library on pins 14 through 17: 
+Stepper myStepper(STEPSPERREVOLUTION, 14, 15, 16, 17);
+
+
+
+
+
+
+
 void setup() //exécuter qu'une fois au démarrage 
 {
   delay(1000);
   //dire que cette PIN est utilisée en sortie 
   pinMode(REDLEDPIN, OUTPUT);
-  pinMode(YELLOWLEDPIN, OUTPUT);
-  pinMode(GREENLEDPIN, OUTPUT);
-  pinMode(BLUELEDPIN, OUTPUT);
-  pinMode(GRLLEDPIN, OUTPUT);
 
   //initialiser la liaison série à 9600 bits par seconde
   Serial.begin(9600);
@@ -164,41 +169,7 @@ void setup() //exécuter qu'une fois au démarrage
 
 void loop() //exécuter en boucle
 {
-  //alternance d'allumage
-  /*digitalWrite(REDLEDPIN, HIGH);
-  delay(4000);
-  digitalWrite(REDLEDPIN, LOW);
-  delay(4000);
-  */
 
-  for(int i=0; i<4; i++)
-  {
-    digitalWrite(14, LOW);
-    digitalWrite(15, HIGH);
-    digitalWrite(16, LOW);
-    digitalWrite(17, HIGH);
-    delay(500);
-    digitalWrite(14, HIGH);
-    digitalWrite(15, LOW);
-    digitalWrite(16, HIGH);
-    digitalWrite(17, LOW);
-    delay(500);
-  }
-
-
-  for(int i=0; i<4; i++)
-  {
-    digitalWrite(14, LOW);
-    digitalWrite(15, HIGH);
-    digitalWrite(16, LOW);
-    digitalWrite(17, HIGH);
-    delay(500);
-    digitalWrite(14, HIGH);
-    digitalWrite(15, LOW);
-    digitalWrite(16, HIGH);
-    digitalWrite(17, LOW);
-    delay(500);
-  }
   //déclare une variable qui va récupérer ce que l'on tape sur le clavier
   char key = keypad.getKey();
   //si il y a eu une touche d'entrée, il l'écrit sur le moniteur (écran)
@@ -216,5 +187,29 @@ void loop() //exécuter en boucle
     Serial.println();
     lastTime = t;
   }
+
+  digitalWrite(REDLEDPIN, HIGH);
+  
+  // set the speed of the motor to 10 RPMs (= 1 rev in 6s)
+  myStepper.setSpeed(6); // at maximum speeed (500sps/s) 1step = 2ms, so 1 revolution = 2048 * 2 ms = 4.096s, so maximum RPMs is 60s/4s = 15RPMs
+  //one full opening of the door is one quarter revolution, so 1.5s (=6s/4)
+  
+  // we perform a quarter revolution clockwise
+  myStepper.step(1024); //this line will take 1.5s
+  delay(2000);
+
+  myStepper.setSpeed(6);
+
+  // we perform a quarter revolution anticlockwise
+  myStepper.step(-1024); //this line will take 1.5s
+  delay(2000);
+
+  digitalWrite(REDLEDPIN, LOW);
+  delay(200);
+
+  digitalWrite(REDLEDPIN, HIGH);
+  delay(200);
+
+  digitalWrite(REDLEDPIN, LOW);
   
 }
