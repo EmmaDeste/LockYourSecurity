@@ -1,10 +1,6 @@
 //blink LED using 1MO and 220kO resistances, a transistor
 
 #define REDLEDPIN 13
-#define YELLOWLEDPIN 17 //correspondant au pin A3 = D17 de l'Arduino Nano 
-#define GREENLEDPIN 16
-#define BLUELEDPIN 15
-#define GRLLEDPIN 14
 
 
 #include <TimeLib.h>
@@ -141,15 +137,24 @@ Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
 
 
+#include <Stepper.h>
+
+#define STEPSPERREVOLUTION 10
+
+// initialize the stepper library on pins 14 through 17: 
+Stepper myStepper(STEPSPERREVOLUTION, 14, 15, 16, 17);
+
+
+
+
+
+
+
 void setup() //exécuter qu'une fois au démarrage 
 {
   delay(1000);
   //dire que cette PIN est utilisée en sortie 
   pinMode(REDLEDPIN, OUTPUT);
-  pinMode(YELLOWLEDPIN, OUTPUT);
-  pinMode(GREENLEDPIN, OUTPUT);
-  pinMode(BLUELEDPIN, OUTPUT);
-  pinMode(GRLLEDPIN, OUTPUT);
 
   //initialiser la liaison série à 9600 bits par seconde
   Serial.begin(9600);
@@ -164,26 +169,6 @@ void setup() //exécuter qu'une fois au démarrage
 
 void loop() //exécuter en boucle
 {
-  //alternance d'allumage
-  /*digitalWrite(REDLEDPIN, HIGH);
-  delay(4000);
-  digitalWrite(REDLEDPIN, LOW);
-  delay(4000);
-  */
-
-  for(int i=0; i<4; i++)
-  {
-    digitalWrite(14, LOW);
-    digitalWrite(15, HIGH);
-    digitalWrite(16, LOW);
-    digitalWrite(17, HIGH);
-    delay(500);
-    digitalWrite(14, HIGH);
-    digitalWrite(15, LOW);
-    digitalWrite(16, HIGH);
-    digitalWrite(17, LOW);
-    delay(500);
-  }
 
   //déclare une variable qui va récupérer ce que l'on tape sur le clavier
   char key = keypad.getKey();
@@ -202,5 +187,22 @@ void loop() //exécuter en boucle
     Serial.println();
     lastTime = t;
   }
+
+  digitalWrite(REDLEDPIN, HIGH);
+  
+  // set the speed of the motor to 3 RPMs (= 1 rev in 20s)
+  myStepper.setSpeed(3);
+  
+  // one rev is 10 steps representing 20s, so 8 steps represents 16s
+  myStepper.step(8); //this line will take 16s
+  delay(2000);
+
+  digitalWrite(REDLEDPIN, LOW);
+  delay(200);
+
+  digitalWrite(REDLEDPIN, HIGH);
+  delay(200);
+
+  digitalWrite(REDLEDPIN, LOW);
   
 }
