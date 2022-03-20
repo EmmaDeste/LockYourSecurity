@@ -197,8 +197,8 @@ void loop() //exécuter en boucle
   myStepper.step(8); //this line will take 16s
   delay(2000);
 
-  myStepper.step(-8); //this line will take 16s
-  delay(2000);
+  //myStepper.step(-8); //this line will take 16s
+  //delay(2000);
   
   digitalWrite(REDLEDPIN, LOW);
   delay(200);

@@ -190,22 +190,17 @@ void loop() //exécuter en boucle
 
   digitalWrite(REDLEDPIN, HIGH);
   
-  // set the speed of the motor to 10 RPMs (= 1 rev in 6s)
+  // set the speed of the motor to 6 RPMs (= 1 rev in 10s)
   myStepper.setSpeed(6); // at maximum speeed (500sps/s) 1step = 2ms, so 1 revolution = 2048 * 2 ms = 4.096s, so maximum RPMs is 60s/4s = 15RPMs
-  //one full opening of the door is one quarter revolution, so 1.5s (=6s/4)
+  //one full opening of the door is one quarter revolution, so 2.5s (=10s/4)
   
   // we perform a quarter revolution clockwise
-  myStepper.step(1024); //this line will take 1.5s
-  delay(2000);
-
-  myStepper.setSpeed(6);
+  myStepper.step(STEPSPERREVOLUTION /4); //this line will take 2.5s
+  delay(4000);//maintain the door open for 4s
 
   // we perform a quarter revolution anticlockwise
-  myStepper.step(-1024); //this line will take 1.5s
-  delay(2000);
-
-  digitalWrite(REDLEDPIN, LOW);
-  delay(200);
+  myStepper.step(-STEPSPERREVOLUTION /4); //this line will take 2.5s
+  delay(8000); //maintain the door closed 8s between two vehicles
 
   digitalWrite(REDLEDPIN, HIGH);
   delay(200);
