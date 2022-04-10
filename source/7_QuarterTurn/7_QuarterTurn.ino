@@ -114,7 +114,7 @@ void processBuff(void)
       setDMY(d,m,y);
     }
 
-    if (nbBuff==4 && tabBuff[0] == '*') // *06# for 6° and *95# for -5°
+    if (nbBuff==4 && tabBuff[0] == '*') // *06# for 6° and *95# for -5° //for maintenance only
     {
       int sign;
       int value;
@@ -145,9 +145,9 @@ char keys[ROWS][COLS] =
   {'*','0','#'}
 };
 
-//we connected the keyboard to the pins from D2 to D8
-byte rowPins[ROWS] = {2, 3, 4, 5}; //connect to the row pinouts of the keypad
-byte colPins[COLS] = {6, 7, 8}; //connect to the column pinouts of the keypad
+//we connected the keyboard to the pins from D6 to D12 //old: from D2 to D8
+byte rowPins[ROWS] = {6, 7, 8, 9}; //connect to the row pinouts of the keypad
+byte colPins[COLS] = {10, 11, 12}; //connect to the column pinouts of the keypad
 
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
