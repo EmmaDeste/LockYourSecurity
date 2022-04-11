@@ -115,11 +115,12 @@ void processBuff(void)
   {
     serialShowBuff();
     Serial.println();
+    
 
     if (nbBuff==6 && tabBuff[0] == '*') //*2134# for 21h34
     {
       Serial.println("Essai envoie bt");
-      MyBlue.write("Nous venons de recevoir 6\n");
+      MyBlue.write(tabBuff);
       int h;
       int m;
       sscanf(tabBuff, "*%02d%02d#", &h, &m);
