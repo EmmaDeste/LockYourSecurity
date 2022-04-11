@@ -118,7 +118,7 @@ void processBuff(void)
 
     if (nbBuff==6 && tabBuff[0] == '*') //*2134# for 21h34
     {
-      Serial.println("Essai ebvoie bt");
+      Serial.println("Essai envoie bt");
       MyBlue.write("Nous venons de recevoir 6\n");
       int h;
       int m;
@@ -213,6 +213,8 @@ void setup() //exécuter qu'une fois au démarrage
   setHM(21,20);
 
   stepperSetup();
+
+  btSetup();
 }
 
 
@@ -238,7 +240,6 @@ void loop() //exécuter en boucle
   }
 
   digitalWrite(REDLEDPIN, HIGH);
-  
   
   // we perform a quarter revolution clockwise
   //stepperTurn(90);
